@@ -31,14 +31,14 @@ fn parse(input: &str) -> Vec<Move> {
         .collect()
 }
 
-pub struct Part1A {
+pub struct PartA {
     moves: Vec<Move>,
 }
 
-impl Solution for Part1A {
+impl Solution for PartA {
     fn new(input: &str) -> Self {
         let moves = parse(input);
-        Part1A { moves }
+        PartA { moves }
     }
 
     fn execute(&self) {
@@ -66,14 +66,14 @@ impl Solution for Part1A {
     }
 }
 
-pub struct Part1B {
+pub struct PartB {
     moves: Vec<Move>,
 }
 
-impl Solution for Part1B {
+impl Solution for PartB {
     fn new(input: &str) -> Self {
         let moves = parse(input);
-        Part1B { moves }
+        PartB { moves }
     }
 
     fn execute(&self) {

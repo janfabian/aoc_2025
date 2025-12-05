@@ -1,4 +1,5 @@
 mod day01;
+mod day02;
 mod read;
 
 fn run_solution<S: read::Solution>(input: &str) {
@@ -7,8 +8,7 @@ fn run_solution<S: read::Solution>(input: &str) {
 }
 
 fn main() {
-    let file = read::read_file("./src/input/01_01.txt").unwrap();
+    let file = read::read_file("./src/input/02_02.txt").unwrap();
 
-    run_solution::<day01::Part1A>(&file);
-    run_solution::<day01::Part1B>(&file);
+    run_solution::<day02::PartB>(&file);
 }
