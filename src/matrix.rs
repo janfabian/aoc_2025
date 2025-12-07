@@ -21,6 +21,37 @@ pub struct Matrix<T> {
     pub data: Vec<Vec<T>>,
 }
 
+impl<T> Matrix<T> {
+    pub fn transpose(&mut self) -> ()
+    where
+        T: Clone,
+    {
+        let rows = self.data.len();
+        let cols = if rows > 0 { self.data[0].len() } else { 0 };
+        let mut transposed_data = vec![vec![]; cols];
+
+        for r in 0..rows {
+            for c in 0..cols {
+                transposed_data[c].push(self.data[r][c].clone());
+            }
+        }
+
+        self.data = transposed_data;
+    }
+
+    pub fn num_rows(&self) -> usize {
+        self.data.len()
+    }
+
+    pub fn last_row(&self) -> Option<&Vec<T>> {
+        self.data.last()
+    }
+
+    pub fn get(&self, row: usize, col: usize) -> Option<&T> {
+        self.data.get(row).and_then(|r| r.get(col))
+    }
+}
+
 impl<T: std::fmt::Debug> std::fmt::Display for Matrix<T> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         for row in &self.data {
@@ -30,6 +61,19 @@ impl<T: std::fmt::Debug> std::fmt::Display for Matrix<T> {
             writeln!(f)?;
         }
         Ok(())
+    }
+}
+
+impl From<Vec<Vec<char>>> for Matrix<char> {
+    fn from(data: Vec<Vec<char>>) -> Self {
+        Matrix { data }
+    }
+}
+
+impl From<&str> for Matrix<char> {
+    fn from(s: &str) -> Self {
+        let data: Vec<Vec<char>> = s.lines().map(|l| l.chars().collect()).collect();
+        Matrix { data }
     }
 }
 
