@@ -1,0 +1,4 @@
+svr: fft dac
+fft: join
+dac: join
+join: out

@@ -1,0 +1,4 @@
+svr: fft bypass
+fft: dac
+bypass: dac
+dac: out

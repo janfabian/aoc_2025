@@ -1,0 +1,11 @@
+svr: a b
+a: c d
+b: e
+c: fft
+d: fft
+e: fft
+fft: f g
+f: dac
+g: mid
+mid: dac
+dac: out

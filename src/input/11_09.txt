@@ -1,0 +1,6 @@
+svr: left right
+left: fft
+right: mid
+fft: mid
+mid: dac
+dac: out

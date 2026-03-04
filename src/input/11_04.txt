@@ -1,0 +1,5 @@
+svr: fft aaa
+fft: dac
+dac: out
+aaa: bbb
+bbb: out
