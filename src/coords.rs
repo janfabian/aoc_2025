@@ -1,8 +1,9 @@
 use std::{
     fmt::Display,
-    ops::{Add, Mul, RangeBounds, Sub},
+    ops::{Add, Mul, Sub},
 };
 
+#[derive(PartialEq, Eq)]
 pub struct Coords<T> {
     pub x: T,
     pub y: T,
@@ -55,8 +56,8 @@ impl Grid<u64> {
     pub fn display_rectangle(&self, p1: &Coords<u64>, p2: &Coords<u64>) {
         let rectangle = Coords::rectangle(p1, p2);
         let bbox = self.bounding_box().unwrap();
-        for y in bbox.0.y - 1..=bbox.1.y + 1 {
-            'xloop: for x in bbox.0.x - 1..=bbox.1.x + 1 {
+        for y in bbox.0.y - (if bbox.0.y > 0 { 1 } else { 0 })..=bbox.1.y + 1 {
+            'xloop: for x in bbox.0.x - (if bbox.0.x > 0 { 1 } else { 0 })..=bbox.1.x + 1 {
                 for rect_coord in &rectangle {
                     if rect_coord.x == x && rect_coord.y == y {
                         print!("@");
@@ -77,25 +78,89 @@ impl Grid<u64> {
         }
     }
 
-    pub fn is_in_shape(&self, y: u64) -> bool {
+    pub fn is_in_shape(&self, p: &Coords<u64>) -> bool {
         let mut counter: u32 = 0;
         for i in 0..self.coords.len() {
-            let y1 = self.coords[i].y;
-            let y2 = self.coords[(i + 1) % self.coords.len()].y;
+            let p1 = &self.coords[i];
+            let p2 = &self.coords[(i + 1) % self.coords.len()];
 
-            let y_max = y1.max(y2);
-            let y_min = y1.min(y2);
-
-            if y_min == y_max {
+            if p1.x != p2.x {
                 continue;
             }
 
-            if y_min < y && y < y_max {
+            if p.x >= p1.x {
+                continue;
+            }
+
+            let y_max = p1.y.max(p2.y);
+            let y_min = p1.y.min(p2.y);
+
+            if y_min < p.y && p.y < y_max {
                 counter += 1;
             }
         }
 
         counter % 2 == 1
+    }
+
+    pub fn is_on_boundary(&self, p: &Coords<u64>) -> bool {
+        for i in 0..self.coords.len() {
+            let p1 = &self.coords[i];
+            let p2 = &self.coords[(i + 1) % self.coords.len()];
+
+            if (p.x == p1.x && p.x == p2.x && p.y <= p1.y.max(p2.y) && p.y >= p1.y.min(p2.y))
+                || (p.y == p1.y && p.y == p2.y && p.x <= p1.x.max(p2.x) && p.x >= p1.x.min(p2.x))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    fn cross_h_v(h: &[&Coords<u64>; 2], v: &[&Coords<u64>; 2]) -> bool {
+        let min_h_x = h[0].x.min(h[1].x);
+        let max_h_x = h[0].x.max(h[1].x);
+
+        let min_v_y = v[0].y.min(v[1].y);
+        let max_v_y = v[0].y.max(v[1].y);
+
+        let x_cond = min_h_x <= v[0].x && v[0].x <= max_h_x;
+        let y_cond = min_v_y <= h[0].y && h[0].y <= max_v_y;
+
+        return x_cond && y_cond;
+    }
+
+    pub fn cross_segment(&self, p: &[Coords<u64>]) -> bool {
+        for i in 0..p.len() {
+            let p1 = &p[i];
+            let p2 = &p[(i + 1) % p.len()];
+
+            if p1 == p2 {
+                continue;
+            }
+
+            for j in 0..self.coords.len() {
+                let q1 = &self.coords[j];
+                let q2 = &self.coords[(j + 1) % self.coords.len()];
+
+                if q1 == q2 {
+                    continue;
+                }
+
+                let semi_res = match (p1.x == p2.x, p1.y == p2.y, q1.x == q2.x, q1.y == q2.y) {
+                    (true, _, _, true) => Grid::cross_h_v(&[q1, q2], &[p1, p2]),
+                    (_, true, true, _) => Grid::cross_h_v(&[p1, p2], &[q1, q2]),
+                    _ => false,
+                };
+
+                if semi_res {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 }
 

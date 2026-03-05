@@ -20,7 +20,7 @@ fn run_solution<S: read::Solution>(input: &str) {
 }
 
 fn main() {
-    let file = read::read_file("./src/input/11_02.txt").unwrap();
+    let file = read::read_file("./src/input/09_02.txt").unwrap();
 
-    run_solution::<day11::PartB>(&file);
+    run_solution::<day09::PartB>(&file);
 }

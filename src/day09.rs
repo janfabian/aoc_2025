@@ -1,3 +1,6 @@
+use std::fs::File;
+use std::io::Write;
+
 use crate::{
     coords::{Coords, Grid},
     read::Solution,
@@ -6,7 +9,7 @@ use crate::{
 fn parse(input: &str) -> Vec<Coords<u64>> {
     return input
         .lines()
-        .map(|s| {
+        .filter_map(|s| {
             let coords = s
                 .split(',')
                 .flat_map(|n| n.parse::<u64>().ok())
@@ -17,8 +20,6 @@ fn parse(input: &str) -> Vec<Coords<u64>> {
                 None
             }
         })
-        .filter(|x| x.is_some())
-        .map(|x| x.unwrap())
         .map(|arr| Coords::from(arr))
         .collect();
 }
@@ -42,7 +43,11 @@ impl Solution for PartA {
                 let area = self.grid.coords[i].area(&self.grid.coords[j], true);
                 // println!(
                 //     "Area between ({}, {}) and ({}, {}) = {}",
-                //     self.grid.coords[i].x, self.grid.coords[i].y, self.grid.coords[j].x, self.grid.coords[j].y, area
+                //     self.grid.coords[i].x,
+                //     self.grid.coords[i].y,
+                //     self.grid.coords[j].x,
+                //     self.grid.coords[j].y,
+                //     area
                 // );
 
                 if area > result {
@@ -53,7 +58,7 @@ impl Solution for PartA {
 
         println!("Max area = {}", result);
 
-        println!("{}", self.grid);
+        // println!("{}", self.grid);
     }
 }
 pub struct PartB {
@@ -73,23 +78,46 @@ impl Solution for PartB {
             'next: for j in i + 1..self.grid.coords.len() {
                 // self.grid
                 //     .display_rectangle(&self.grid.coords[i], &self.grid.coords[j]);
-
-                let rect = Coords::rectangle(&self.grid.coords[i], &self.grid.coords[j]);
-                for coord in rect {
-                    let is_in = self.grid.is_in_shape(coord.y);
-
-                    if !is_in {
-                        continue 'next;
-                    }
-                }
+                // println!("============");
 
                 let area = self.grid.coords[i].area(&self.grid.coords[j], true);
                 if area > result {
+                    let (p1, p2) = (&self.grid.coords[i], &self.grid.coords[j]);
+                    let rect = Coords::rectangle(&self.grid.coords[i], &self.grid.coords[j]);
+
+                    for i in 0..self.grid.coords.len() {
+                        let (c1, c2) = (
+                            &self.grid.coords[i],
+                            &self.grid.coords[(i + 1) % self.grid.coords.len()],
+                        );
+
+                        let right = p1.x.max(p2.x) <= c1.x.min(c2.x);
+                        let left = p1.x.min(p2.x) >= c1.x.max(c2.x);
+                        let up = p1.y.max(p2.y) <= c1.y.min(c2.y);
+                        let down = p1.y.min(p2.y) >= c1.y.max(c2.y);
+
+                        if !(right || left || up || down) {
+                            continue 'next;
+                        }
+                    }
+
+                    // for coord in &rect {
+                    //     let is_in =
+                    //         self.grid.is_on_boundary(&coord) || self.grid.is_in_shape(&coord);
+
+                    //     if !is_in {
+                    //         continue 'next;
+                    //     }
+                    // }
+
+                    println!("{}", area);
+
                     result = area;
                 }
             }
         }
 
         println!("Max enclosed area = {}", result);
+        // println!("{}", self.grid);
     }
 }
